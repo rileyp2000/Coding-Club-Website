@@ -28,38 +28,27 @@
 
 			function init() {
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 5000;
+				camera.position.x = 10;
+				camera.position.y = 10;
+				camera.position.z = 8000;
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 				var geometry = new THREE.BoxBufferGeometry( 100,100,100 );
 				var material = new THREE.MeshNormalMaterial();
 				group = new THREE.Group();
-				/*for ( var i = 0; i < 100; i ++ ) {
-					var mesh = new THREE.Mesh( geometry, material );
-					//console.log(mesh);
-					mesh.position.x = Math.random() * 2000 - 1000;
-					//mesh.position.x = i * 50 +100;
-					mesh.position.y = Math.random() * 2000 - 1000;
-					//mesh.position.y = i * 50 +1;
-					mesh.position.z = Math.random() * 2000 - 1000;
-					//mesh.positon.z = i * 50 +1;
-					//mesh.rotation.x = Math.random() * 2 * Math.PI;
-					//mesh.rotation.y = Math.random() * 2 * Math.PI;
-					mesh.matrixAutoUpdate = false;
-					mesh.updateMatrix();
-					group.add( mesh );
-				}*/
 
-				for(var xx = 0; xx < 2; xx++){
-						var xPos = xx * 50;
-						if(xx >= 1){xPos += 500;}
-						for(var yy = 0; yy < 2; yy++){
-								var yPos = yy * 50;
-								if(yy >= 1){yPos += 500;}
-								for(var zz = 0; zz < 2; zz++){
-										var zPos = zz * 50 + 500;
-										if(zz >= 1){zPos += 500;}
+				var num = 10;
+				var offset = 200;
+				var extraOff = 0;
+				for(var xx = 0; xx < num; xx++){
+						var xPos = xx * offset;
+
+						for(var yy = 0; yy < num; yy++){
+								var yPos = yy * offset;
+
+								for(var zz = 0; zz < num; zz++){
+										var zPos = zz * offset;
 
 										var mesh = new THREE.Mesh( geometry, material );
 
@@ -106,7 +95,7 @@
 				//camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 				camera.lookAt( scene.position );
 				//group.rotation.x = rx;
-				group.rotation.y = 1;//ry;
+				group.rotation.y = ry;
 				//group.rotation.z = rz;
 				renderer.render( scene, camera );
 			}
