@@ -9,6 +9,7 @@
 	<link id="font" href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" media="none">
 	<link rel="stylesheet" href="style.css">
   <script src = "script.js"></script>
+  <script src="three.min.js"></script>
   <title>Bishop Ireton Coding Club</title>
 </head>
 <body>
@@ -24,11 +25,68 @@
 <!-- Use any element to open the sidenav -->
 <span onclick="openNav()" style='font-size: 2em; padding: .5em'; text-align: right>&#9776;</span>
 <div class="jumbotron" style='padding: 2em 2em 2em 2em'>
-  <img src = "img/logo.png"></img>
+  <!--<img src = "img/logo.png"></img>
   <div class = "text-block">
     <h1 style='text-align: center; font-weight: bold'>Bishop Ireton<h1>
     <h1 style='text-align: center; font-weight: bold'>Coding Club</h1>
-  </div>
+  </div>-->
+
+  <script type="text/javascript">
+    var camera, scene, renderer;
+    var geometry, material, mesh;
+
+    init();
+    animate();
+
+  function init() {
+
+      var texture = new THREE.TextureLoader().load( 'img/logo.png' );
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      // how many times to repeat in each direction; the default is (1,1),
+      // which is probably why your example wasn't working
+      //texture.repeat.set( 2, 2 );
+
+
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10);
+      camera.position.z = 1;
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color( 0xffffff);
+
+      geometry = new THREE.CircleGeometry(.5,32);
+      material = new THREE.MeshBasicMaterial({ map: texture });
+      materials = [new THREE.MeshBasicMaterial({map: texture, side: THREE.FrontSide}),
+                 new THREE.MeshBasicMaterial({map: texture, side: THREE.BackSide})];
+
+      for (var i = 0, len = geometry.faces.length; i < len; i++) {
+          var face = geometry.faces[i].clone();
+          face.materialIndex = 1;
+          geometry.faces.push(face);
+          geometry.faceVertexUvs[0].push(geometry.faceVertexUvs[0][i].slice(0));
+      }
+
+      mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
+      scene.add(mesh);
+
+      renderer = new THREE.WebGLRenderer({antialias: true});
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor( 0xffffff, 0.0 );
+      document.body.appendChild(renderer.domElement);
+
+    }
+
+    function animate() {
+
+      requestAnimationFrame(animate);
+
+      mesh.rotation.x += 0.05;
+      mesh.rotation.y += 0.05;
+
+      renderer.render(scene, camera);
+
+    }
+  </script>
+
 </div>
 
 <div class="page-header" style='text-align: center'>
