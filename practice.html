@@ -17,40 +17,67 @@
 	<body>
 
 		<script src="three.min.js"></script>
+		<script src="square.js"></script>
 
 		<script>
 			var camera, scene, renderer, stats, group;
+			var colored = fillColored();
 			var mouseX = 0, mouseY = 0;
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 			init();
 			animate();
 
+			function checkTexture(x,y,z){
+					for(var i = 0; i < colored.length; i++){
+						if(colored[i].x == x && colored[i].y == y && colored[i].z == z){
+								return true;
+						}
+					}
+					return false;
+			}
+
 			function init() {
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.x = 10;
-				camera.position.y = 10;
-				camera.position.z = 8000;
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.x = 0;
+				camera.position.y = 0;
+				camera.position.z = 1000;
+				camera.translateZ(1000);
+
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
+
+				var texture = new THREE.TextureLoader().load( 'img/logo.gif' );
+				var texture2 = new THREE.TextureLoader().load( 'img/biSeal.gif' );
+
 				var geometry = new THREE.BoxBufferGeometry( 100,100,100 );
 				var material = new THREE.MeshNormalMaterial();
+				var material2 = new THREE.MeshBasicMaterial({ map: texture });
+				var material3 =  new THREE.MeshBasicMaterial({ map: texture2 });
 				group = new THREE.Group();
 
-				var num = 10;
-				var offset = 200;
+				var num = 5;
+				var offset = 150;
 				var extraOff = 0;
+				var widGroup = num * offset - 50;
+				console.log(widGroup);
+
 				for(var xx = 0; xx < num; xx++){
-						var xPos = xx * offset;
+						var xPos = (xx * offset) - windowHalfX;
 
 						for(var yy = 0; yy < num; yy++){
 								var yPos = yy * offset;
 
 								for(var zz = 0; zz < num; zz++){
 										var zPos = zz * offset;
-
-										var mesh = new THREE.Mesh( geometry, material );
+										if(checkTexture(xx,yy,zz)){
+												var mesh = new THREE.Mesh(geometry, material2);
+												console.log(xx + ", " + yy + ", " + zz);
+										}
+										else{
+												var mesh = new THREE.Mesh( geometry, material3 );
+										}
 
 										mesh.position.x = xPos;
 										mesh.position.y = yPos;
