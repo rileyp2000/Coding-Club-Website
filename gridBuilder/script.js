@@ -36,14 +36,23 @@ function buttonSave() {
     for (var c = 0; c < col; c++) {
       if(squares[r][c].selected != 0){
         if(squares[r][c].selected == 1){
-          reds.push(new Array(r,c));
+          reds.push(new Point(r,c));
         }
         else{
-          yellow.push(new Array(r,c));
+          yellow.push(new Point(r,c));
         }
       }
     }
   }
+  var para = document.createElement("p");
+  var para2 = document.createElement("p");
+  var node = document.createTextNode("Reds" + reds);
+  var node2 = document.createTextNode("Yellows" + yellow);
+  para.appendChild(node);
+  para2.appendChild(node2);
+  var element = document.getElementById("div1");
+  element.appendChild(para);
+  element.appendChild(para2);
 }
 
 function draw() {
@@ -78,4 +87,13 @@ function Square(x, y) {
     rect(x * 30, y * 30, 30, 30);
   };
 
+}
+
+function Point(x,y){
+  this.x = x;
+  this.y = y;
+
+  Point.prototype.toString = function pointToString(){
+    return "(" + x + ", " + y + ")";
+  }
 }
