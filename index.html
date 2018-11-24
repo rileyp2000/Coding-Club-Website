@@ -9,7 +9,7 @@
 	<link id="font" href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" media="none">
 	<link rel="stylesheet" href="style.css">
   <script src = "script.js"></script>
-  <script src="../libs/three.min.js"></script>
+  <script src="libs/three.min.js"></script>
   <script src="square.js"></script>
   <title>Bishop Ireton Coding Club</title>
 </head>
@@ -33,8 +33,29 @@
     var mouseX = 0, mouseY = 0;
     var windowHalfX = window.innerWidth / 2;
     var windowHalfY = window.innerHeight / 2;
+    var reds = "(3; 1),(3; 2),(3; 3),(3; 4),(3; 5),(4; 0),(4; 6),(5; 0),(5; 6),(6; 0),(6; 6),(7; 0),(7; 6),(8; 1),(8; 5)";
+    var yellow = "(1; 4),(1; 5),(1; 6),(1; 7),(1; 8),(2; 3),(2; 9),(3; 9),(4; 3),(4; 9),(5; 3),(5; 9),(6; 4),(6; 8)";
+    var rPT = process(reds,",");
+    console.log(rPT);
+    var yPT = process(yellow, ",");
+    console.log(yPT);
     init();
     animate();
+
+    function process(arr, delim){
+      var temp = arr.split(delim);
+      var t2 = [];
+      if(temp.length != 2){
+      for(var i = 0; i < temp.length; i++){
+        t2.push(process(temp[i], ";"));
+      }
+    }
+    else {
+        return new Array(arr[1], arr[4]);
+    }
+
+      return t2;
+    }
 
     function checkTexture(x,y,z){
         for(var i = 0; i < colored.length; i++){
@@ -81,7 +102,7 @@
                   var zPos = zz * offset;
                   if(checkTexture(xx,yy,zz)){
                       var mesh = new THREE.Mesh(geometry, material2);
-                      console.log(xx + ", " + yy + ", " + zz);
+                      //console.log(xx + ", " + yy + ", " + zz);
                   }
                   else{
                       var mesh = new THREE.Mesh( geometry, material3 );
@@ -97,7 +118,7 @@
           }
         }
       }
-      console.log(group);
+      //console.log(group);
       scene.add( group );
       //
       renderer = new THREE.WebGLRenderer( { antialias: true } );

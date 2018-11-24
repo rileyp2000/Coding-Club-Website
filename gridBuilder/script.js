@@ -44,10 +44,11 @@ function buttonSave() {
       }
     }
   }
+
   var para = document.createElement("p");
   var para2 = document.createElement("p");
-  var node = document.createTextNode("Reds" + reds);
-  var node2 = document.createTextNode("Yellows" + yellow);
+  var node = document.createTextNode("Reds " + reds);
+  var node2 = document.createTextNode("Yellows " + yellow);
   para.appendChild(node);
   para2.appendChild(node2);
   var element = document.getElementById("div1");
@@ -94,6 +95,6 @@ function Point(x,y){
   this.y = y;
 
   Point.prototype.toString = function pointToString(){
-    return "(" + x + ", " + y + ")";
+    return "(" + this.x + "; " + this.y + ")";
   }
 }
