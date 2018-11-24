@@ -9,7 +9,8 @@
 	<link id="font" href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" media="none">
 	<link rel="stylesheet" href="style.css">
   <script src = "script.js"></script>
-  <script src="three.min.js"></script>
+  <script src="../libs/three.min.js"></script>
+  <script src="square.js"></script>
   <title>Bishop Ireton Coding Club</title>
 </head>
 <body>
@@ -25,67 +26,118 @@
 <!-- Use any element to open the sidenav -->
 <span onclick="openNav()" style='font-size: 2em; padding: .5em'; text-align: right>&#9776;</span>
 <div class="jumbotron" style='padding: 2em 2em 2em 2em'>
-  <!--<img src = "img/logo.png"></img>
-  <div class = "text-block">
-    <h1 style='text-align: center; font-weight: bold'>Bishop Ireton<h1>
-    <h1 style='text-align: center; font-weight: bold'>Coding Club</h1>
-  </div>-->
 
-  <script type="text/javascript">
-    var camera, scene, renderer;
-    var geometry, material, mesh;
-
+  <script>
+    var camera, scene, renderer, stats, group;
+    var colored = fillColored();
+    var mouseX = 0, mouseY = 0;
+    var windowHalfX = window.innerWidth / 2;
+    var windowHalfY = window.innerHeight / 2;
     init();
     animate();
 
-  function init() {
-
-      var texture = new THREE.TextureLoader().load( 'img/logo.png' );
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      // how many times to repeat in each direction; the default is (1,1),
-      // which is probably why your example wasn't working
-      //texture.repeat.set( 2, 2 );
-
-
-      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10);
-      camera.position.z = 1;
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color( 0xffffff);
-
-      geometry = new THREE.CircleGeometry(.5,32);
-      material = new THREE.MeshBasicMaterial({ map: texture });
-      materials = [new THREE.MeshBasicMaterial({map: texture, side: THREE.FrontSide}),
-                 new THREE.MeshBasicMaterial({map: texture, side: THREE.BackSide})];
-
-      for (var i = 0, len = geometry.faces.length; i < len; i++) {
-          var face = geometry.faces[i].clone();
-          face.materialIndex = 1;
-          geometry.faces.push(face);
-          geometry.faceVertexUvs[0].push(geometry.faceVertexUvs[0][i].slice(0));
-      }
-
-      mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
-      scene.add(mesh);
-
-      renderer = new THREE.WebGLRenderer({antialias: true});
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setClearColor( 0xffffff, 0.0 );
-      document.body.appendChild(renderer.domElement);
-
+    function checkTexture(x,y,z){
+        for(var i = 0; i < colored.length; i++){
+          if(colored[i].x == x && colored[i].y == y && colored[i].z == z){
+              return true;
+          }
+        }
+        return false;
     }
 
+    function init() {
+      camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+      camera.position.x = 0;
+      camera.position.y = 0;
+      camera.position.z = 1000;
+      camera.translateZ(1000);
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color( 0xffffff );
+      scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
+
+      var texture = new THREE.TextureLoader().load( 'img/logo.gif' );
+      var texture2 = new THREE.TextureLoader().load( 'img/hackBI.gif' );
+
+      var geometry = new THREE.BoxBufferGeometry( 100,100,100 );
+      var material = new THREE.MeshNormalMaterial();
+      var material2 = new THREE.MeshBasicMaterial({ map: texture });
+      var material3 =  new THREE.MeshBasicMaterial({ map: texture2 });
+      group = new THREE.Group();
+
+      var num = 5;
+      var offset = 150;
+      var extraOff = 0;
+      var widGroup = num * offset - 50;
+      console.log(widGroup);
+
+      for(var xx = 0; xx < num; xx++){
+          var xPos = (xx * offset) - windowHalfX;
+
+          for(var yy = 0; yy < num; yy++){
+              var yPos = yy * offset;
+
+              for(var zz = 0; zz < num; zz++){
+                  var zPos = zz * offset;
+                  if(checkTexture(xx,yy,zz)){
+                      var mesh = new THREE.Mesh(geometry, material2);
+                      console.log(xx + ", " + yy + ", " + zz);
+                  }
+                  else{
+                      var mesh = new THREE.Mesh( geometry, material3 );
+                  }
+
+                  mesh.position.x = xPos;
+                  mesh.position.y = yPos;
+                  mesh.position.z = zPos;
+
+                  mesh.matrixAutoUpdate = false;
+                  mesh.updateMatrix();
+                  group.add( mesh );
+          }
+        }
+      }
+      console.log(group);
+      scene.add( group );
+      //
+      renderer = new THREE.WebGLRenderer( { antialias: true } );
+      renderer.setPixelRatio( window.devicePixelRatio );
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+      //
+      //
+      window.addEventListener( 'resize', onWindowResize, false );
+    }
+    function onWindowResize() {
+      windowHalfX = window.innerWidth / 2;
+      windowHalfY = window.innerHeight / 2;
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+    }
+
+    //
     function animate() {
-
-      requestAnimationFrame(animate);
-
-      mesh.rotation.x += 0.05;
-      mesh.rotation.y += 0.05;
-
-      renderer.render(scene, camera);
-
+      requestAnimationFrame( animate );
+      render();
+    }
+    function render() {
+      var time = Date.now() * 0.001;
+      var rx = Math.sin( time * 0.7 ) * 0.5,
+        ry = Math.sin( time * 0.3 ) * 0.9,
+        rz = Math.sin( time * 0.2 ) * 0.5;
+      //camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+      //camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+      camera.lookAt( scene.position );
+      //group.rotation.x = rx;
+      group.rotation.y = ry;
+      //group.rotation.z = rz;
+      renderer.render( scene, camera );
     }
   </script>
+
+
+
 
 </div>
 
@@ -108,3 +160,81 @@ Hackathons that many club members attend, such as HackTJ, another high school Ha
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<img src = "img/logo.png"></img>
+<div class = "text-block">
+  <h1 style='text-align: center; font-weight: bold'>Bishop Ireton<h1>
+  <h1 style='text-align: center; font-weight: bold'>Coding Club</h1>
+</div>-->
+
+<!--<script type="text/javascript">
+  var camera, scene, renderer;
+  var geometry, material, mesh;
+
+  init();
+  animate();
+
+function init() {
+
+    var texture = new THREE.TextureLoader().load( 'img/logo.png' );
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    // how many times to repeat in each direction; the default is (1,1),
+    // which is probably why your example wasn't working
+    //texture.repeat.set( 2, 2 );
+
+
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10);
+    camera.position.z = 1;
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0xffffff);
+
+    geometry = new THREE.CircleGeometry(.5,32);
+    material = new THREE.MeshBasicMaterial({ map: texture });
+    materials = [new THREE.MeshBasicMaterial({map: texture, side: THREE.FrontSide}),
+               new THREE.MeshBasicMaterial({map: texture, side: THREE.BackSide})];
+
+    for (var i = 0, len = geometry.faces.length; i < len; i++) {
+        var face = geometry.faces[i].clone();
+        face.materialIndex = 1;
+        geometry.faces.push(face);
+        geometry.faceVertexUvs[0].push(geometry.faceVertexUvs[0][i].slice(0));
+    }
+
+    mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
+    scene.add(mesh);
+
+    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor( 0xffffff, 0.0 );
+    document.body.appendChild(renderer.domElement);
+
+  }
+
+  function animate() {
+
+    requestAnimationFrame(animate);
+
+    mesh.rotation.x += 0.05;
+    mesh.rotation.y += 0.05;
+
+    renderer.render(scene, camera);
+
+  }
+</script>-->
