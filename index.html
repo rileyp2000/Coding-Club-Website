@@ -51,42 +51,46 @@
       }
     }
     else {
-        return new Array(arr[1], arr[4]);
+        var z = [arr[1], arr[4]];
+        return z;
     }
 
       return t2;
     }
 
-    function checkTexture(x,y,z){
-        for(var i = 0; i < colored.length; i++){
-          if(colored[i].x == x && colored[i].y == y && colored[i].z == z){
-              return true;
+    function checkTexture(x,y){
+        for(var i = 0; i < yPT.length; i++){
+          if(rPT[i][0] == x && rPT[i][1] == y){
+              return 0;
+          }
+          else{
+            if(yPT[i][0] == x && yPT[i][1] == y){
+                return 1;
+            }
           }
         }
-        return false;
+        return 2;
     }
 
     function init() {
       camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
       camera.position.x = 0;
       camera.position.y = 0;
-      camera.position.z = 1000;
+      camera.position.z = 3000;
       camera.translateZ(1000);
 
       scene = new THREE.Scene();
       scene.background = new THREE.Color( 0xffffff );
-      scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
-
-      var texture = new THREE.TextureLoader().load( 'img/logo.gif' );
-      var texture2 = new THREE.TextureLoader().load( 'img/hackBI.gif' );
+      //scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
       var geometry = new THREE.BoxBufferGeometry( 100,100,100 );
-      var material = new THREE.MeshNormalMaterial();
-      var material2 = new THREE.MeshBasicMaterial({ map: texture });
-      var material3 =  new THREE.MeshBasicMaterial({ map: texture2 });
+      //TODO: change to red, yellow, and basic
+      var rojo = new THREE.MeshBasicMaterial({ color: 0xd00000});
+      var amarillo = new THREE.MeshBasicMaterial({ color: 0xffdf00 });
+      var white =  new THREE.MeshBasicMaterial({ color: 0x000fff });
       group = new THREE.Group();
 
-      var num = 5;
+      var num = 10;
       var offset = 150;
       var extraOff = 0;
       var widGroup = num * offset - 50;
@@ -100,12 +104,18 @@
 
               for(var zz = 0; zz < num; zz++){
                   var zPos = zz * offset;
-                  if(checkTexture(xx,yy,zz)){
-                      var mesh = new THREE.Mesh(geometry, material2);
-                      //console.log(xx + ", " + yy + ", " + zz);
+                  var ct = checkTexture(xx,yy);
+                  if(zz != num - 1){ct = 2;}
+                  if(ct == 0){
+                      var mesh = new THREE.Mesh(geometry, rojo);
                   }
                   else{
-                      var mesh = new THREE.Mesh( geometry, material3 );
+                    if(ct == 1){
+                      var mesh = new THREE.Mesh( geometry, amarillo );
+                    }
+                    else{
+                      var mesh = new THREE.Mesh( geometry, white);
+                    }
                   }
 
                   mesh.position.x = xPos;
@@ -150,7 +160,7 @@
       //camera.position.x += ( mouseX - camera.position.x ) * 0.05;
       //camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
       camera.lookAt( scene.position );
-      //group.rotation.x = rx;
+      group.rotation.x = rx;
       group.rotation.y = ry;
       //group.rotation.z = rz;
       renderer.render( scene, camera );
